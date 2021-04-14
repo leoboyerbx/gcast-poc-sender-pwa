@@ -1,21 +1,20 @@
 {
-  "name": "gcast-poc-pwa",
-  "version": "0.0.0",
+  "name": "tmp",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
-    "socket.io-client": "^4.0.1",
-    "uuid": "^8.3.2",
-    "vue": "^3.0.5",
-    "vue3-qrcode-reader": "^0.0.1"
+    "core-js": "^3.6.5",
+    "register-service-worker": "^1.7.1",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.2.1",
-    "@vue/compiler-sfc": "^3.0.5",
-    "vite": "^2.1.5",
-    "vite-plugin-pwa": "^0.7.1"
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-pwa": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "vue-template-compiler": "^2.6.11"
   }
 }
