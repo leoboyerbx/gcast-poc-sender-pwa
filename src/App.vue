@@ -3,7 +3,7 @@
     <div class="cast-button">
       <google-cast-launcher></google-cast-launcher>
     </div>
-    <qrcode-stream @decode="onDecode"></qrcode-stream>
+    <QrcodeStream @decode="onDecode"></QrcodeStream>
     <h1 v-if="state === 'notconnected'">En attente</h1>
     <h1 v-if="state === 'connected'">Le jeu !</h1>
   </main>
@@ -13,14 +13,10 @@
 <script>
 import { v4 as uuid } from 'uuid'
 import { io } from 'socket.io-client'
-import {QrcodeStream} from 'vue-qrcode-reader/src'
+// import {QrcodeStream} from 'vue-qrcode-reader/src'
+import qr from 'vue3-qrcode-reader'
+console.log(qr)
 
-const initializeCastApi = function() {
-  cast.framework.CastContext.getInstance().setOptions({
-    receiverApplicationId: '720A8D7E',
-    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-  });
-};
 const sessionId = uuid()
 const socket = io('https://cast.leoboyer.dev')
 
@@ -34,19 +30,12 @@ export default {
     }
   },
   created() {
-    window['__onGCastApiAvailable'] = function(isAvailable) {
+    window['__onGCastApiAvailable'] = (isAvailable) => {
       console.log('init', isAvailable)
       if (isAvailable) {
-        initializeCastApi();
+        this.initializeCastApi();
       }
     };
-
-    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, e => {
-      if (e.sessionState === 'SESSION_STARTED') {
-        this.pairWithCast()
-        this.pairWithServer()
-      }
-    })
 
     // bindings
     socket.on('ready', () => this.state = 'connected')
@@ -54,6 +43,20 @@ export default {
   methods: {
     onDecode(decodedString) {
 
+
+    },
+    initializeCastApi() {
+      cast.framework.CastContext.getInstance().setOptions({
+        receiverApplicationId: '720A8D7E',
+        autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+      })
+      cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, e => {
+        console.log(e)
+        if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
+          this.pairWithCast()
+          this.pairWithServer()
+        }
+      })
     },
     pairWithCast() {
       const castSession = cast.framework.CastContext.getInstance().getCurrentSession();
@@ -66,7 +69,7 @@ export default {
     },
     pairWithServer () {
       console.log({
-        sessionId,
+        id: sessionId,
         type: 'player'
       })
       socket.emit('config', {
