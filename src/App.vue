@@ -3,7 +3,7 @@
     <div class="cast-button">
       <google-cast-launcher></google-cast-launcher>
     </div>
-<!--    <QrcodeStream @decode="onDecode"></QrcodeStream>-->
+    <QrcodeStream @decode="onDecode"></QrcodeStream>
     <h1 v-if="state === 'notconnected'">En attente</h1>
     <h1 v-if="state === 'connected'">Le jeu !</h1>
   </main>
@@ -13,13 +13,13 @@
 <script>
 import { v4 as uuid } from 'uuid'
 import { io } from 'socket.io-client'
-// import {QrcodeStream} from 'vue-qrcode-reader/src'
+import {QrcodeStream} from 'vue-qrcode-reader'
 
-const sessionId = uuid()
+let sessionId = uuid()
 const socket = io('https://cast.leoboyer.dev')
 
 export default {
-  // components: {QrcodeStream},
+  components: {QrcodeStream},
   data() {
     return {
       state: 'notconnected'
@@ -38,8 +38,10 @@ export default {
   },
   methods: {
     onDecode(decodedString) {
-
-
+      if (decodedString.length === 36) {
+        sessionId = decodedString
+        this.pairWithServer()
+      }
     },
     initializeCastApi() {
       cast.framework.CastContext.getInstance().setOptions({
